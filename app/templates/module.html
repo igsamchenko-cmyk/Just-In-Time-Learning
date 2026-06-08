@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="lesson-layout">
+  <aside class="lesson-side">
+    <a class="back" href="/courses/{{ course.id }}">← До курсу</a>
+    <span class="module-number">Модуль {{ module.position }}</span>
+    <h1>{{ module.title }}</h1>
+    <p>{{ module.learning_goal }}</p>
+  </aside>
+
+  <article class="lesson">
+    <h2>Матеріал</h2>
+    <p>{{ module.content.content }}</p>
+
+    <h2>Приклад</h2>
+    <p>{{ module.content.example }}</p>
+
+    <div class="task">
+      <h2>Практичне завдання</h2>
+      <p>{{ module.content.practical_task }}</p>
+      <small>Критерій: {{ module.content.correct_answer_criteria }}</small>
+    </div>
+
+    {% if attempts %}
+      <section class="feedback-list">
+        <h2>Фідбек</h2>
+        {% for attempt in attempts %}
+          <div class="feedback {{ 'ok' if attempt.is_correct else 'retry' }}">
+            <strong>Спроба {{ attempt.attempt_number }}</strong>
+            <p>{{ attempt.feedback }}</p>
+            {% if attempt.hint %}<p><b>Підказка:</b> {{ attempt.hint }}</p>{% endif %}
+            {% if attempt.explanation %}<p><b>Пояснення:</b> {{ attempt.explanation }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {% set latest_attempt = attempts[-1] if attempts else none %}
+    {% if module.status != "completed" %}
+      <form class="form answer-form" action="/courses/{{ course.id }}/modules/{{ module.id }}/attempts" method="post">
+        <label>
+          Твоя відповідь
+          <textarea name="answer" rows="5" required placeholder="Опиши дію, причину і як перевіриш результат"></textarea>
+        </label>
+        <button class="button primary" type="submit">Перевірити відповідь</button>
+      </form>
+      {% if latest_attempt and latest_attempt.next_action == "allow_continue" %}
+        <form action="/courses/{{ course.id }}/modules/{{ module.id }}/continue" method="post">
+          <button class="button" type="submit">Продовжити після пояснення</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <div class="complete-box">
+        <h2>Модуль завершено</h2>
+        <p>Наступний модуль відкрито, якщо він є в курсі.</p>
+        <a class="button primary" href="/courses/{{ course.id }}">Повернутися до карти</a>
+      </div>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

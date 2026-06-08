@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+  <p class="eyebrow">Новий мікрокурс</p>
+  <h1>Що хочеш опанувати?</h1>
+  <form class="form" action="/courses" method="post">
+    <label>
+      Коротко опиши ціль
+      <textarea name="goal" rows="5" required placeholder="Наприклад: хочу за 2 дні навчитися налаштовувати деплой Python-скрипта на VPS через GitHub Actions"></textarea>
+    </label>
+    <label>
+      Додаткові нотатки або матеріали
+      <textarea name="notes" rows="6" placeholder="Що вже знаєш, які є обмеження, власні нотатки або текст, на який треба спертися"></textarea>
+    </label>
+    <div class="actions">
+      <a class="button ghost" href="/">Назад</a>
+      <button class="button primary" type="submit">Згенерувати план</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

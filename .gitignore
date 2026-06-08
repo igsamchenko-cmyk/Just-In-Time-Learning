@@ -1,0 +1,8 @@
+.venv/
+.runtime/
+.git-local/
+__pycache__/
+*.pyc
+.env
+.github-token
+learning_mvp.db

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">Персональне навчання українською</p>
+    <h1>Мої курси</h1>
+    <p>Створюй короткі практичні маршрути під конкретну задачу і продовжуй з того місця, де зупинився.</p>
+  </div>
+  <a class="button primary" href="/courses/new">Створити новий курс</a>
+</section>
+
+{% if courses %}
+  <section class="grid">
+    {% for course in courses %}
+      <article class="card">
+        <div class="card-header">
+          <span class="status">{{ course.status }}</span>
+          <span>{{ course_progress(course) }}%</span>
+        </div>
+        <h2>{{ course.title }}</h2>
+        <p>{{ course.original_request }}</p>
+        <div class="progress"><span style="width: {{ course_progress(course) }}%"></span></div>
+        <a class="button" href="/courses/{{ course.id }}">Продовжити</a>
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="empty">
+    <h2>Поки курсів немає</h2>
+    <p>Опиши, чого хочеш навчитися, і система збере першу дорожню карту.</p>
+    <a class="button primary" href="/courses/new">Створити курс</a>
+  </section>
+{% endif %}
+{% endblock %}

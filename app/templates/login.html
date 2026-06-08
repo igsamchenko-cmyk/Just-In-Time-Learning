@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="login-panel">
+  <p class="eyebrow">Вхід</p>
+  <h1>Почни персональне навчання</h1>
+  <p>Увійди, щоб зберігати курси, прогрес і повернення до модулів.</p>
+
+  <div class="login-actions">
+    {% if google_enabled %}
+      <a class="button primary" href="/auth/google">Увійти через Google</a>
+    {% else %}
+      <button class="button disabled" disabled>Google OAuth ще не налаштовано</button>
+    {% endif %}
+    <form action="/login/demo" method="post">
+      <button class="button" type="submit">Демо-вхід</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

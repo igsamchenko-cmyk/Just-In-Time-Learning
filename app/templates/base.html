@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "Генератор інтерактивного навчання" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Генератор навчання</a>
+      <span class="badge">MVP</span>
+      {% if request.session.get("user_id") %}
+        <a class="logout" href="/logout">Вийти</a>
+      {% endif %}
+    </header>
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

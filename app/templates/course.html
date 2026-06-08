@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="course-head">
+  <div>
+    <a class="back" href="/">← Мої курси</a>
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.original_request }}</p>
+    <form class="inline-form" action="/courses/{{ course.id }}/delete" method="post">
+      <button class="link-danger" type="submit">Видалити курс</button>
+    </form>
+  </div>
+  <div class="meter">
+    <strong>{{ progress }}%</strong>
+    <span>прогрес</span>
+  </div>
+</section>
+
+{% if course.safety_status != "allowed" %}
+  <section class="warning">
+    <h2>Тема потребує обмеження</h2>
+    <p>Я можу дати освітній огляд цієї теми, але не професійну консультацію або інструкції, які можуть бути небезпечними.</p>
+  </section>
+{% elif course.status == "needs_clarification" %}
+  <section class="panel">
+    <h2>Потрібно трохи уточнити</h2>
+    <form class="form" action="/courses/{{ course.id }}/clarifications" method="post">
+      {% for item in course.clarifications %}
+        <label>
+          {{ item.question }}
+          <input name="answers" required>
+        </label>
+      {% endfor %}
+      <button class="button primary" type="submit">Продовжити генерацію</button>
+    </form>
+  </section>
+{% else %}
+  <section class="module-grid">
+    {% for module in course.modules %}
+      <article class="module-card {{ module.status }}">
+        <span class="module-number">Модуль {{ module.position }}</span>
+        <h2>{{ module.title }}</h2>
+        <p>{{ module.short_description }}</p>
+        <small>{{ module.learning_goal }}</small>
+        {% if module.status == "locked" %}
+          <button class="button disabled" disabled>Заблоковано</button>
+        {% else %}
+          <a class="button" href="/courses/{{ course.id }}/modules/{{ module.id }}">
+            {% if module.status == "completed" %}Переглянути{% else %}Відкрити{% endif %}
+          </a>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </section>
+{% endif %}
+{% endblock %}
