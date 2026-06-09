@@ -5,6 +5,7 @@
     <a class="back" href="/">← Мої курси</a>
     <h1>{{ course.title }}</h1>
     <p>{{ course.original_request }}</p>
+    <a class="button" href="/courses/{{ course.id }}/export.md">Завантажити конспект</a>
     <form class="inline-form" action="/courses/{{ course.id }}/delete" method="post">
       <button class="link-danger" type="submit">Видалити курс</button>
     </form>

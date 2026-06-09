@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 
-from fastapi.responses import RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -37,6 +37,7 @@ from app.services import (
     course_progress,
     create_course_for_user,
     ensure_module_content,
+    render_course_markdown,
     submit_module_attempt,
 )
 
@@ -261,6 +262,23 @@ def api_delete_course(course_id: int, request: Request, db: Session = Depends(ge
     db.commit()
 
 
+@app.get("/api/courses/{course_id}/export.md", response_class=PlainTextResponse)
+def api_export_course_markdown(
+    course_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user = require_user(request, db)
+    course = require_owned_course(db, user, course_id)
+    return PlainTextResponse(
+        render_course_markdown(course),
+        media_type="text/markdown; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="course-{course.id}.md"',
+        },
+    )
+
+
 @app.post("/api/courses/{course_id}/clarifications", response_model=CourseDetailResponse)
 def api_answer_clarifications(
     course_id: int,
@@ -393,6 +411,23 @@ def delete_course(course_id: int, request: Request, db: Session = Depends(get_db
     db.delete(course)
     db.commit()
     return RedirectResponse("/", status_code=303)
+
+
+@app.get("/courses/{course_id}/export.md", response_class=PlainTextResponse)
+def export_course_markdown(
+    course_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user = require_user(request, db)
+    course = require_owned_course(db, user, course_id)
+    return PlainTextResponse(
+        render_course_markdown(course),
+        media_type="text/markdown; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="course-{course.id}.md"',
+        },
+    )
 
 
 @app.get("/courses/{course_id}")

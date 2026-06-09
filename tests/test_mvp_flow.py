@@ -70,6 +70,15 @@ class MVPFlowTest(unittest.TestCase):
         self.assertEqual(updated_course["modules"][1]["status"], "available")
         self.assertGreater(updated_course["progress"], 0)
 
+        export_response = self.client.get(f"/api/courses/{course_id}/export.md")
+        self.assertEqual(export_response.status_code, 200)
+        self.assertIn("text/markdown", export_response.headers["content-type"])
+        exported = export_response.text
+        self.assertIn("# ", exported)
+        self.assertIn("### ", exported)
+        self.assertIn("Практичне завдання", exported)
+        self.assertIn("Фідбек", exported)
+
     def test_short_goal_creates_clarifying_questions(self) -> None:
         response = self.client.post("/api/courses", json={"goal": "Python", "notes": ""})
 

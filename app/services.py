@@ -33,6 +33,92 @@ def course_progress(course: Course) -> int:
     return round(completed / len(course.modules) * 100)
 
 
+def render_course_markdown(course: Course) -> str:
+    lines = [
+        f"# {course.title}",
+        "",
+        "## Навчальна ціль",
+        "",
+        course.original_request,
+        "",
+    ]
+
+    if course.user_notes:
+        lines.extend(["## Нотатки користувача", "", course.user_notes, ""])
+
+    lines.extend(
+        [
+            "## Прогрес",
+            "",
+            f"- Статус курсу: `{course.status}`",
+            f"- Статус безпеки: `{course.safety_status}`",
+            f"- Прогрес: {course_progress(course)}%",
+            "",
+            "## Модулі",
+            "",
+        ]
+    )
+
+    if not course.modules:
+        lines.extend(["Поки що модулі не згенеровані.", ""])
+        return "\n".join(lines).strip() + "\n"
+
+    for module in course.modules:
+        lines.extend(
+            [
+                f"### Модуль {module.position}. {module.title}",
+                "",
+                f"**Статус:** `{module.status}`",
+                "",
+                f"**Опис:** {module.short_description}",
+                "",
+                f"**Ціль:** {module.learning_goal}",
+                "",
+            ]
+        )
+
+        if module.content:
+            lines.extend(
+                [
+                    "#### Матеріал",
+                    "",
+                    module.content.content,
+                    "",
+                    "#### Приклад",
+                    "",
+                    module.content.example,
+                    "",
+                    "#### Практичне завдання",
+                    "",
+                    module.content.practical_task,
+                    "",
+                    "#### Критерії відповіді",
+                    "",
+                    module.content.correct_answer_criteria,
+                    "",
+                ]
+            )
+
+        if module.attempts:
+            lines.extend(["#### Спроби та фідбек", ""])
+            for attempt in module.attempts:
+                result = "правильно" if attempt.is_correct else "потрібне доопрацювання"
+                lines.extend(
+                    [
+                        f"- Спроба {attempt.attempt_number}: **{result}**",
+                        f"  - Відповідь: {attempt.answer}",
+                        f"  - Фідбек: {attempt.feedback}",
+                    ]
+                )
+                if attempt.hint:
+                    lines.append(f"  - Підказка: {attempt.hint}")
+                if attempt.explanation:
+                    lines.append(f"  - Пояснення: {attempt.explanation}")
+            lines.append("")
+
+    return "\n".join(lines).strip() + "\n"
+
+
 def create_course_for_user(db: Session, user: User, goal: str, notes: str | None) -> Course:
     provider = get_ai_provider()
     try:

@@ -49,6 +49,12 @@ DELETE /api/courses/{course_id}
 Видаляє курс поточного користувача.
 
 ```http
+GET /api/courses/{course_id}/export.md
+```
+
+Експортує курс, матеріали модулів, завдання та фідбек у Markdown.
+
+```http
 POST /api/courses/{course_id}/clarifications
 Content-Type: application/json
 
