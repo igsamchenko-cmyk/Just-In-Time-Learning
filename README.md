@@ -57,3 +57,11 @@ GEMINI_MODEL=gemini-2.5-flash
 ```powershell
 .\.runtime\python\python.exe -m unittest
 ```
+
+## Міграції бази даних
+
+```powershell
+.\migrate.ps1
+```
+
+Міграції використовують `DATABASE_URL` із `.env`. За замовчуванням це локальна SQLite база `learning_mvp.db`.
