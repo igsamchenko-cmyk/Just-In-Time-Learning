@@ -277,7 +277,7 @@ class GeminiProvider(ProviderNotConfigured):
         schema: dict[str, Any],
     ) -> dict[str, Any]:
         url = self.endpoint.format(model=self.model)
-        payload = {
+        payload: dict[str, Any] = {
             "systemInstruction": {
                 "parts": [{"text": system_prompt}],
             },
@@ -293,12 +293,19 @@ class GeminiProvider(ProviderNotConfigured):
                 "responseSchema": schema,
             },
         }
+        return self._post_and_parse_json(url, payload)
+
+    def _post_and_parse_json(self, url: str, payload: dict[str, Any]) -> dict[str, Any]:
         headers = {
             "Content-Type": "application/json",
             "x-goog-api-key": self.api_key,
         }
         with httpx.Client(timeout=60) as client:
             response = client.post(url, headers=headers, json=payload)
+            if response.status_code == 503 and "responseSchema" in payload.get("generationConfig", {}):
+                fallback_payload = json.loads(json.dumps(payload))
+                fallback_payload["generationConfig"].pop("responseSchema", None)
+                response = client.post(url, headers=headers, json=fallback_payload)
             response.raise_for_status()
             data = response.json()
 

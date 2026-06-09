@@ -10,7 +10,7 @@ Gemini підключається через REST `generateContent` API.
 AI_PROVIDER=gemini
 AI_FALLBACK_TO_MOCK=true
 GEMINI_API_KEY=твій_ключ_з_Google_AI_Studio
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 3. Перезапусти застосунок:
@@ -36,3 +36,5 @@ http://127.0.0.1:8000/api/health
 ```
 
 Якщо ключ не заданий і `AI_FALLBACK_TO_MOCK=true`, застосунок продовжить працювати через `MockProvider`.
+
+Провайдер спочатку пробує structured JSON schema. Якщо Gemini тимчасово повертає `503` саме на schema mode, застосунок повторює запит у JSON mode без schema і парсить відповідь.

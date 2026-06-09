@@ -34,7 +34,7 @@ http://127.0.0.1:8000
 ```text
 AI_PROVIDER=gemini
 GEMINI_API_KEY=твій_ключ
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Якщо `AI_PROVIDER=gemini`, але ключа немає, застосунок повернеться до mock-режиму, якщо `AI_FALLBACK_TO_MOCK=true`.
