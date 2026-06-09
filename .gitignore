@@ -6,4 +6,5 @@ __pycache__/
 .env
 .github-token
 learning_mvp.db
+test_learning_mvp.db
 *.bundle

@@ -50,3 +50,9 @@ GEMINI_MODEL=gemini-3.5-flash
 - API: `docs/API.md`
 - Ручна перевірка: `docs/MANUAL_TEST.md`
 - Gemini provider: `docs/GEMINI.md`
+
+## Тести
+
+```powershell
+.\.runtime\python\python.exe -m unittest
+```

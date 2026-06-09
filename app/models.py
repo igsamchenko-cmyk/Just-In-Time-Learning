@@ -1,9 +1,13 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+
+def utc_now() -> datetime:
+    return datetime.now(UTC)
 
 
 class User(Base):
@@ -14,8 +18,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(255))
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
 
     courses: Mapped[list["Course"]] = relationship(back_populates="user")
 
@@ -32,8 +36,8 @@ class Course(Base):
     language: Mapped[str] = mapped_column(String(20), default="uk")
     safety_status: Mapped[str] = mapped_column(String(50), default="allowed")
     current_module_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
 
     user: Mapped["User"] = relationship(back_populates="courses")
     clarifications: Mapped[list["CourseClarification"]] = relationship(
@@ -54,7 +58,7 @@ class CourseClarification(Base):
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
     question: Mapped[str] = mapped_column(Text)
     answer: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
 
     course: Mapped["Course"] = relationship(back_populates="clarifications")
 
@@ -70,8 +74,8 @@ class Module(Base):
     learning_goal: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(50), default="locked")
     generated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
 
     course: Mapped["Course"] = relationship(back_populates="modules")
     content: Mapped["ModuleContent"] = relationship(
@@ -95,8 +99,8 @@ class ModuleContent(Base):
     task_type: Mapped[str] = mapped_column(String(50))
     practical_task: Mapped[str] = mapped_column(Text)
     correct_answer_criteria: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
 
     module: Mapped["Module"] = relationship(back_populates="content")
 
@@ -114,7 +118,7 @@ class Attempt(Base):
     hint: Mapped[str | None] = mapped_column(Text, nullable=True)
     explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
     next_action: Mapped[str] = mapped_column(String(50))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
 
     module: Mapped["Module"] = relationship(back_populates="attempts")
 
@@ -131,4 +135,4 @@ class AIRequest(Base):
     prompt_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     completion_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="ok")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
