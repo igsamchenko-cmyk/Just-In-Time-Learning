@@ -37,7 +37,7 @@
 
     {% set latest_attempt = attempts[-1] if attempts else none %}
     {% if module.status != "completed" %}
-      <form class="form answer-form" action="/courses/{{ course.id }}/modules/{{ module.id }}/attempts" method="post">
+      <form class="form answer-form" action="/courses/{{ course.id }}/modules/{{ module.id }}/attempts" method="post" data-loading-text="Перевіряємо відповідь...">
         <label>
           Твоя відповідь
           <textarea name="answer" rows="5" required placeholder="Опиши дію, причину і як перевіриш результат"></textarea>
@@ -45,7 +45,7 @@
         <button class="button primary" type="submit">Перевірити відповідь</button>
       </form>
       {% if latest_attempt and latest_attempt.next_action == "allow_continue" %}
-        <form action="/courses/{{ course.id }}/modules/{{ module.id }}/continue" method="post">
+        <form action="/courses/{{ course.id }}/modules/{{ module.id }}/continue" method="post" data-loading-text="Відкриваємо наступний модуль...">
           <button class="button" type="submit">Продовжити після пояснення</button>
         </form>
       {% endif %}

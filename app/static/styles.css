@@ -199,6 +199,35 @@ p {
   cursor: not-allowed;
 }
 
+.button.is-loading,
+.button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.button.is-loading::before {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  content: "";
+  animation: spin 0.75s linear infinite;
+}
+
+.loading-note {
+  margin: -6px 0 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .form {
   display: grid;
   gap: 18px;
