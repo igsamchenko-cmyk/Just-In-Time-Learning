@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="error-panel">
+  <p class="eyebrow">Тимчасова помилка</p>
+  <h1>{{ title }}</h1>
+  <p>{{ message }}</p>
+  <div class="actions">
+    <a class="button" href="{{ back_url }}">Повернутися</a>
+    <a class="button primary" href="/">Мої курси</a>
+  </div>
+</section>
+{% endblock %}

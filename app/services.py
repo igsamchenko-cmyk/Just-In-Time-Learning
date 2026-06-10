@@ -6,6 +6,10 @@ from app.config import settings
 from app.models import AIRequest, Attempt, Course, CourseClarification, Module, ModuleContent, User
 
 
+class AIServiceError(RuntimeError):
+    pass
+
+
 def log_ai_request(
     db: Session,
     user_id: int | None,
@@ -195,7 +199,7 @@ def create_course_for_user(db: Session, user: User, goal: str, notes: str | None
     except Exception:
         log_ai_request(db, user.id, "generate_course_plan", "error")
         db.commit()
-        raise
+        raise AIServiceError("Не вдалося згенерувати план курсу. Спробуй ще раз трохи пізніше.")
 
     course = Course(
         user_id=user.id,
@@ -246,7 +250,7 @@ def answer_course_clarifications(db: Session, course: Course, answers: list[str]
     except Exception:
         log_ai_request(db, course.user_id, "answer_clarifications", "error", course.id)
         db.commit()
-        raise
+        raise AIServiceError("Не вдалося оновити план курсу після уточнень. Спробуй ще раз.")
 
     course.title = plan.course_title
     course.status = "active" if plan.safety_status == "allowed" else "blocked"
@@ -300,7 +304,7 @@ def ensure_module_content(db: Session, course: Course, module: Module) -> Module
     except Exception:
         log_ai_request(db, course.user_id, "generate_module_content", "error", course.id, module.id)
         db.commit()
-        raise
+        raise AIServiceError("Не вдалося згенерувати матеріал модуля. Спробуй відкрити модуль ще раз.")
     db.add(
         ModuleContent(
             module_id=module.id,
@@ -342,7 +346,7 @@ def submit_module_attempt(db: Session, course: Course, module: Module, answer: s
     except Exception:
         log_ai_request(db, course.user_id, "evaluate_answer", "error", course.id, module.id)
         db.commit()
-        raise
+        raise AIServiceError("Не вдалося перевірити відповідь. Спробуй надіслати її ще раз.")
     attempt = Attempt(
         module_id=module.id,
         user_id=course.user_id,

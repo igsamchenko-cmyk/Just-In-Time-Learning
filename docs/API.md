@@ -24,6 +24,17 @@ GET /api/me
 
 ## Курси
 
+Якщо AI provider тимчасово недоступний, API повертає:
+
+```json
+{
+  "detail": "Людське пояснення помилки",
+  "retry": true
+}
+```
+
+HTTP статус: `503`.
+
 ```http
 GET /api/courses
 ```

@@ -1,5 +1,6 @@
 import os
 import unittest
+from unittest.mock import patch
 
 
 os.environ["DATABASE_URL"] = "sqlite:///./test_learning_mvp.db"
@@ -10,6 +11,29 @@ from fastapi.testclient import TestClient
 
 from app.database import Base, engine
 from app.main import app
+
+
+class FailingProvider:
+    def generate_course_plan(self, user_request: str, user_notes: str | None = None):
+        raise RuntimeError("provider unavailable")
+
+    def generate_module_content(
+        self,
+        course_title: str,
+        module_title: str,
+        learning_goal: str,
+        previous_feedback: list[str],
+    ):
+        raise RuntimeError("provider unavailable")
+
+    def evaluate_answer(
+        self,
+        task: str,
+        criteria: str,
+        answer: str,
+        attempt_number: int,
+    ):
+        raise RuntimeError("provider unavailable")
 
 
 class MVPFlowTest(unittest.TestCase):
@@ -109,6 +133,21 @@ class MVPFlowTest(unittest.TestCase):
         self.assertEqual(course["status"], "blocked")
         self.assertEqual(course["safety_status"], "educational_only")
         self.assertEqual(course["modules"], [])
+
+    def test_ai_provider_errors_return_retryable_api_response(self) -> None:
+        with patch("app.services.get_ai_provider", return_value=FailingProvider()):
+            response = self.client.post(
+                "/api/courses",
+                json={
+                    "goal": "Хочу навчитися планувати тиждень без перевантаження",
+                    "notes": "",
+                },
+            )
+
+        self.assertEqual(response.status_code, 503)
+        payload = response.json()
+        self.assertTrue(payload["retry"])
+        self.assertIn("Не вдалося", payload["detail"])
 
 
 if __name__ == "__main__":

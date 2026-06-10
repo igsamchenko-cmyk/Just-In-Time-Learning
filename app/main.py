@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 
-from fastapi.responses import PlainTextResponse, RedirectResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -39,6 +39,7 @@ from app.services import (
     course_progress,
     create_course_for_user,
     ensure_module_content,
+    AIServiceError,
     render_course_markdown,
     submit_module_attempt,
     user_system_status,
@@ -60,6 +61,30 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
+
+
+@app.exception_handler(AIServiceError)
+async def ai_service_error_handler(request: Request, exc: AIServiceError):
+    message = str(exc)
+    if request.url.path.startswith("/api/"):
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": message,
+                "retry": True,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "error.html",
+        {
+            "request": request,
+            "title": "AI тимчасово недоступний",
+            "message": message,
+            "back_url": request.headers.get("referer") or "/",
+        },
+        status_code=503,
+    )
 
 
 def require_user(request: Request, db: Session) -> User:
