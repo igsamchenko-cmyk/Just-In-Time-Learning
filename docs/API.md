@@ -11,6 +11,12 @@ GET /api/health
 Повертає стан застосунку та активний AI provider.
 
 ```http
+GET /api/system/status
+```
+
+Повертає стан AI provider-а та персональну статистику поточного користувача.
+
+```http
 GET /api/me
 ```
 

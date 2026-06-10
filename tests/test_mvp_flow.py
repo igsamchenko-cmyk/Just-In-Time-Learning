@@ -70,6 +70,16 @@ class MVPFlowTest(unittest.TestCase):
         self.assertEqual(updated_course["modules"][1]["status"], "available")
         self.assertGreater(updated_course["progress"], 0)
 
+        status_response = self.client.get("/api/system/status")
+        self.assertEqual(status_response.status_code, 200)
+        status = status_response.json()
+        self.assertEqual(status["active_provider"], "mock")
+        self.assertEqual(status["total_courses"], 1)
+        self.assertGreaterEqual(status["total_modules"], 3)
+        self.assertEqual(status["completed_modules"], 1)
+        self.assertEqual(status["total_attempts"], 1)
+        self.assertGreaterEqual(status["ai_requests_total"], 3)
+
         export_response = self.client.get(f"/api/courses/{course_id}/export.md")
         self.assertEqual(export_response.status_code, 200)
         self.assertIn("text/markdown", export_response.headers["content-type"])

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="course-head">
+  <div>
+    <a class="back" href="/">← Мої курси</a>
+    <p class="eyebrow">Стан системи</p>
+    <h1>Панель контролю</h1>
+    <p>Короткий огляд роботи платформи, AI-провайдера і твого навчального прогресу.</p>
+  </div>
+</section>
+
+<section class="status-grid">
+  <article class="status-card">
+    <span>Активний AI</span>
+    <strong>{{ status.active_provider }}</strong>
+    <small>Налаштовано: {{ status.configured_provider }}</small>
+  </article>
+  <article class="status-card">
+    <span>Gemini</span>
+    <strong>{% if status.gemini_configured %}підключено{% else %}не підключено{% endif %}</strong>
+    <small>{{ status.gemini_model }}</small>
+  </article>
+  <article class="status-card">
+    <span>Курси</span>
+    <strong>{{ status.total_courses }}</strong>
+    <small>Активні: {{ status.active_courses }} · Завершені: {{ status.completed_courses }}</small>
+  </article>
+  <article class="status-card">
+    <span>Модулі</span>
+    <strong>{{ status.completed_modules }} / {{ status.total_modules }}</strong>
+    <small>Завершено модулів</small>
+  </article>
+  <article class="status-card">
+    <span>Спроби</span>
+    <strong>{{ status.total_attempts }}</strong>
+    <small>Відповіді, які перевіряв AI</small>
+  </article>
+  <article class="status-card">
+    <span>AI-запити</span>
+    <strong>{{ status.ai_requests_total }}</strong>
+    <small>OK: {{ status.ai_requests_ok }} · Помилки: {{ status.ai_requests_error }}</small>
+  </article>
+</section>
+{% endblock %}

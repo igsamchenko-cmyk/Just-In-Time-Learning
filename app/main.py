@@ -29,9 +29,11 @@ from app.schemas import (
     ModuleContentResponse,
     ModuleDetailResponse,
     ModuleSummaryResponse,
+    SystemStatusResponse,
     UserResponse,
 )
 from app.services import (
+    ai_runtime_status,
     answer_course_clarifications,
     continue_after_explanation as continue_after_explanation_service,
     course_progress,
@@ -39,6 +41,7 @@ from app.services import (
     ensure_module_content,
     render_course_markdown,
     submit_module_attempt,
+    user_system_status,
 )
 
 
@@ -209,22 +212,13 @@ def api_me(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/api/health")
 def api_health():
-    gemini_configured = bool(settings.gemini_api_key)
-    claude_configured = bool(settings.claude_api_key)
-    active_provider = settings.ai_provider
-    if settings.ai_provider == "gemini" and not gemini_configured and settings.ai_fallback_to_mock:
-        active_provider = "mock"
-    if settings.ai_provider == "claude" and not claude_configured and settings.ai_fallback_to_mock:
-        active_provider = "mock"
+    return ai_runtime_status()
 
-    return {
-        "status": "ok",
-        "configured_provider": settings.ai_provider,
-        "active_provider": active_provider,
-        "gemini_configured": gemini_configured,
-        "claude_configured": claude_configured,
-        "gemini_model": settings.gemini_model,
-    }
+
+@app.get("/api/system/status", response_model=SystemStatusResponse)
+def api_system_status(request: Request, db: Session = Depends(get_db)):
+    user = require_user(request, db)
+    return user_system_status(db, user)
 
 
 @app.get("/api/courses", response_model=list[CourseSummaryResponse])
@@ -374,6 +368,20 @@ def new_course(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request, db):
         return RedirectResponse("/login", status_code=303)
     return templates.TemplateResponse("new_course.html", {"request": request})
+
+
+@app.get("/status")
+def system_status(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    return templates.TemplateResponse(
+        "status.html",
+        {
+            "request": request,
+            "status": user_system_status(db, user),
+        },
+    )
 
 
 @app.post("/courses")

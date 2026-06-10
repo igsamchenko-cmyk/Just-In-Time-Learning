@@ -72,3 +72,22 @@ class UserResponse(BaseModel):
     email: str
     name: str
     avatar_url: str | None
+
+
+class SystemStatusResponse(BaseModel):
+    status: str
+    configured_provider: str
+    active_provider: str
+    gemini_configured: bool
+    claude_configured: bool
+    gemini_model: str
+    total_courses: int
+    active_courses: int
+    completed_courses: int
+    blocked_courses: int
+    total_modules: int
+    completed_modules: int
+    total_attempts: int
+    ai_requests_total: int
+    ai_requests_ok: int
+    ai_requests_error: int

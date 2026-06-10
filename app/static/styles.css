@@ -43,6 +43,10 @@ a {
   text-decoration: none;
 }
 
+.logout + .logout {
+  margin-left: 12px;
+}
+
 .inline-form {
   display: inline;
 }
@@ -352,6 +356,32 @@ textarea {
 .complete-box {
   border-color: #9fd9b0;
   background: #f0fff4;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.status-card {
+  display: grid;
+  gap: 8px;
+  min-height: 130px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.status-card span,
+.status-card small {
+  color: var(--muted);
+}
+
+.status-card strong {
+  font-size: 28px;
+  line-height: 1.1;
 }
 
 @media (max-width: 760px) {

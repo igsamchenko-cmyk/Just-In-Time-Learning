@@ -11,6 +11,7 @@
       <a class="brand" href="/">Генератор навчання</a>
       <span class="badge">MVP</span>
       {% if request.session.get("user_id") %}
+        <a class="logout" href="/status">Статус</a>
         <a class="logout" href="/logout">Вийти</a>
       {% endif %}
     </header>

@@ -26,6 +26,74 @@ def log_ai_request(
     )
 
 
+def ai_runtime_status() -> dict[str, str | bool]:
+    gemini_configured = bool(settings.gemini_api_key)
+    claude_configured = bool(settings.claude_api_key)
+    active_provider = settings.ai_provider
+    if settings.ai_provider == "gemini" and not gemini_configured and settings.ai_fallback_to_mock:
+        active_provider = "mock"
+    if settings.ai_provider == "claude" and not claude_configured and settings.ai_fallback_to_mock:
+        active_provider = "mock"
+
+    return {
+        "status": "ok",
+        "configured_provider": settings.ai_provider,
+        "active_provider": active_provider,
+        "gemini_configured": gemini_configured,
+        "claude_configured": claude_configured,
+        "gemini_model": settings.gemini_model,
+    }
+
+
+def user_system_status(db: Session, user: User) -> dict[str, str | bool | int]:
+    course_filter = Course.user_id == user.id
+    module_filter = Module.course_id.in_(select(Course.id).where(course_filter))
+
+    return {
+        **ai_runtime_status(),
+        "total_courses": db.scalar(select(func.count(Course.id)).where(course_filter)) or 0,
+        "active_courses": db.scalar(
+            select(func.count(Course.id)).where(course_filter, Course.status == "active")
+        )
+        or 0,
+        "completed_courses": db.scalar(
+            select(func.count(Course.id)).where(course_filter, Course.status == "completed")
+        )
+        or 0,
+        "blocked_courses": db.scalar(
+            select(func.count(Course.id)).where(course_filter, Course.status == "blocked")
+        )
+        or 0,
+        "total_modules": db.scalar(select(func.count(Module.id)).where(module_filter)) or 0,
+        "completed_modules": db.scalar(
+            select(func.count(Module.id)).where(module_filter, Module.status == "completed")
+        )
+        or 0,
+        "total_attempts": db.scalar(
+            select(func.count(Attempt.id)).where(Attempt.user_id == user.id)
+        )
+        or 0,
+        "ai_requests_total": db.scalar(
+            select(func.count(AIRequest.id)).where(AIRequest.user_id == user.id)
+        )
+        or 0,
+        "ai_requests_ok": db.scalar(
+            select(func.count(AIRequest.id)).where(
+                AIRequest.user_id == user.id,
+                AIRequest.status == "ok",
+            )
+        )
+        or 0,
+        "ai_requests_error": db.scalar(
+            select(func.count(AIRequest.id)).where(
+                AIRequest.user_id == user.id,
+                AIRequest.status == "error",
+            )
+        )
+        or 0,
+    }
+
+
 def course_progress(course: Course) -> int:
     if not course.modules:
         return 0
