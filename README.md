@@ -51,6 +51,7 @@ GEMINI_MODEL=gemini-2.5-flash
 - API: `docs/API.md`
 - Ручна перевірка: `docs/MANUAL_TEST.md`
 - Gemini provider: `docs/GEMINI.md`
+- Deploy: `docs/DEPLOY.md`
 
 ## Тести
 
@@ -65,3 +66,20 @@ GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Міграції використовують `DATABASE_URL` із `.env`. За замовчуванням це локальна SQLite база `learning_mvp.db`.
+
+## Docker
+
+1. Створи `.env` на основі `.env.production.example`.
+2. Запусти:
+
+```powershell
+docker compose up --build
+```
+
+Застосунок буде доступний на:
+
+```text
+http://127.0.0.1:8000
+```
+
+Контейнер автоматично виконує міграції перед стартом. SQLite база зберігається у Docker volume `learning_data`.

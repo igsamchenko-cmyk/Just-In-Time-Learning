@@ -1,0 +1,10 @@
+.env
+.git
+.git-local
+.runtime
+.venv
+__pycache__
+*.pyc
+*.db
+*.bundle
+.github-token
